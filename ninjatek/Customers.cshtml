@@ -1,0 +1,92 @@
+﻿@using MySql.Data.MySqlClient;
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Customers";
+    var errorMessage = "";
+    var successMessage = "";
+    var cn = new MySqlConnection(Global.ConnectionString());
+    cn.Open();
+    if (IsPost)
+    {
+        var submit = Request.Form["submit"];
+        var customerID = long.Parse(Request.Form["customerID"]);
+        switch (submit)
+        {
+            case "Delete":
+                try
+                {
+                    Customer.DeleteCustomer(customerID);
+                    successMessage = "Sucessfully deleted customer.";
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = ex.Message;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#customerTable').DataTable();
+    });
+</script>
+<div class="content-wrapper">
+    <hgroup class="title">
+        <h1>@Page.Title</h1>
+        <h2></h2>
+    </hgroup>
+    <p class="error">@errorMessage</p>
+    <p class="message-success">@successMessage</p>
+
+    @{
+        var customers = Customer.GetAllCustomers(true);
+        var headers = new string[] { "Name", "Address", "City", "Phone Number", "Email", "Comments","Delete","Profile","Add Job" };
+    }
+    <table id="customerTable" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                @foreach (var header in headers)
+                {
+                    <th>@header.ToString()</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in customers)
+            {
+                <tr>
+                    <td>@customer.Name</td>
+                    <td>@customer.Address</td>
+                    <td>@customer.City</td>
+                    <td>@customer.PhoneNumber</td>
+                    <td>@customer.Email</td>
+                    <td>@customer.Comments</td>
+                    <!--Delete Customer-->
+                    <td>
+                        <form method="post">
+                            <input type="hidden" name="customerID" value="@customer.ID" />
+                            <input type="submit" name="submit" value="Delete" class="submit" />
+                        </form>
+                    </td>
+                    <!--View Customer Details page-->
+                    <td>
+                        <form method="post" action="Customer.cshtml">
+                            <input type="hidden" name="customerID" value="@customer.ID" />
+                            <input type="submit" name="submit" value="View" class="submit" />
+                        </form>
+                    </td>
+                    <!--Add Job-->
+                    <td>
+                        <form method="post" action="AddJob.cshtml">
+                            <input type="hidden" name="customerID" value="@customer.ID" />
+                            <input type="submit" name="submit" value="Add Job" class="submit" />
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

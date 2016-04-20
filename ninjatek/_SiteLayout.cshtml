@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@Page.Title</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="//cdn.datatables.net/plug-ins/1.10.7/integration/jqueryui/dataTables.jqueryui.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel=" stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
+
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="http://www.datatables.net/release-datatables/extensions/FixedColumns/js/dataTables.fixedColumns.js"></script>
+    <script src="~/Scripts/jquery-ui-1.10.3.js"></script>
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+    <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+    <header>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p class="site-title"><a href="~/">NINJATEK.CA | TORONTO WINDOW & EAVES</a></p>
+            </div>
+            <div class="float-right">
+                <section id="login">
+                    @if (WebSecurity.IsAuthenticated)
+                    {
+                        <text>
+                            Hello, <a class="email" href="~/Ninjatek.cshtml" title="Manage">@WebSecurity.CurrentUserName</a>!
+                            <form id="logoutForm" action="~/Account/Logout" method="post">
+                                @AntiForgery.GetHtml()
+                                <a href="javascript:document.getElementById('logoutForm').submit()">Log out</a>
+                            </form>
+                        </text>
+                    }
+                    else
+                    {
+                        <ul>
+                            <li><a href="~/Account/Login">Log in</a></li>
+                        </ul>
+                    }
+                </section>
+                @if (WebSecurity.IsAuthenticated) // Put this behind authentication.
+                {
+                    <nav>
+                        <ul id="menu">
+                            <li><a href="~/AddCustomer.cshtml">AddCustomer</a></li>
+                            <li><a href="~/Customers.cshtml">Customer List</a></li>
+                            <li><a href="~/Jobs.cshtml">Job List</a></li>
+                        </ul>
+                    </nav>
+                } 
+            </div>
+        </div>
+    </header>
+    <div id="body">
+        @if (WebSecurity.IsAuthenticated || Page.Title == "Log in")
+        {
+            @RenderSection("featured", required: false)
+            <section class="content-wrapper main-content clear-fix">
+                @RenderBody()
+            </section>
+        }
+        else
+        {
+            Response.Redirect("~/Account/Login.cshtml");
+            //Redirect to login.
+        }
+    </div>
+    <footer>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p>&copy; @DateTime.Now.Year - Ninjatek</p>
+            </div>
+        </div>
+    </footer>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,76 @@
+﻿@using System.Net.Mail;
+@{
+    Layout = "~/_MainLayout.cshtml";
+    Page.Title = "NINJATEK.CA | TORONTO WINDOW & EAVES";
+    var errorText = "";
+    if (IsPost)
+    {
+        var submit = Request.Form["submit"];
+        var fname = Request.Form["fname"];
+        var lname = Request.Form["lname"];
+        var addr = Request.Form["addr"];
+        var phone = Request.Form["phone"];
+        var email = Request.Form["email"];
+        var services = Request.Form["services"];
+        var details = Request.Form["details"]; 
+
+        var from = "service@ninjatek.ca";
+        var to = "service@ninjatek.ca";
+        var subject = "Requested Quote";
+        var body = string.Format("Name: {0} {1}\nAddress:{2}\nPhone: {3}\nEmail: {4}\nServices: {5}\nDetails: {6}\n",fname,lname,addr,phone,email,services,details);
+
+        using (var mailObj = new MailMessage(from, to, subject, body))
+        {
+           // mailObj.To.Add("service@ninjatek.ca");
+            var client = new SmtpClient("smtp.secureserver.net"); // smtpout.secureserver.net | mailstore1.secureserver.net
+            try
+            {
+                client.Send(mailObj);
+            }
+            catch (Exception ex)
+            {
+                errorText = ex.Message;
+            }finally
+            {
+                client.Dispose();
+            }
+        }
+    }
+}
+
+
+<div>
+    <div style="background-color:white;margin:0;display:flex;">
+        <div style=" width:650px; margin:0 auto; text-align:center;color:black;">
+            <h2 style="margin:50px 0px 50px 0px;">NINJA WINDOW & EAVES (647)999-9413</h2>
+            <h4 style="margin:50px 0px 50px 0px;">CALL IN OR FILL OUT THE REQUIRED INFORMATION TO RECEIVE A NO-OBLIGATION FREE ESTIMATE.</h4>
+            <form method="post">
+                <p>@errorText</p>
+                <p>First Name *</p>
+                <input type="text" class="input" name="fname" />
+
+                <p>Last Name *</p>
+                <input type="text" class="input" name="lname" />
+
+                <p>Address *</p>
+                <input type="text" class="input" name="addr" />
+
+                <p>Phone numbers(s) *</p>
+                <input type="text" class="input" name="phone" />
+
+                <p>Email Address *</p>
+                <input type="text" class="input" name="email" />
+
+                <p>Services (example: Window Cleaning) *</p>
+                <input type="text" class="input" name="services" />
+
+                <p>Details *</p>
+                <textarea cols="40" rows="5" name="details" class="input"></textarea>
+                <br />
+
+                <input type="submit" name="submit" value="GetAQuote" class="submit" />
+                </form>
+</div>
+    </div>
+</div>
+

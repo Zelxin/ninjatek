@@ -1,0 +1,121 @@
+﻿@using MySql.Data.MySqlClient;
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Add Job";
+    var errorMessage = "";
+    var successMessage = "";
+
+    var cn = new MySqlConnection(Global.ConnectionString());
+    cn.Open();
+
+    //Need current job, either new or will be set on edit.
+    Job job = new Job();
+    //Get all customers
+    var customers = Customer.GetAllCustomers(false);
+    var customersSelectList = (from c in customers
+                               select new SelectListItem() { Text = c.Name, Value = c.ID.ToString() }).ToList();                   
+                              
+    if (IsPost) // This should be on it's own page after i test that it works properly.
+    {
+        var submit = Request.Form["submit"];
+        long customerID = -1;
+        long.TryParse(Request.Form["customerID"], out customerID);
+        long jobID = -1;
+        long.TryParse(Request.Form["jobID"], out jobID);
+
+        switch (submit)
+        {
+            case "Add Job": // Add job function to this means we were sent a customer already
+                try
+                {
+                    //Basically I'm setting the customer that was sent to the selected customer.
+                    //Since we already have a list, i just used linq to grab the customer that matches and set the selected to true
+                    customersSelectList.First(x => x.Value.Equals(customerID.ToString())).Selected = true;
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = ex.Message;
+                }
+                break;
+            case "Save Job": //This will save to the database
+                try
+                {
+                    var tCust = Customer.LoadCustomer(customerID);
+                    var newJob = new Job(tCust);
+                    newJob.Details = Request.Form["Details"];
+                    newJob.RequestedOn = DateTime.Parse(Request.Form["RequestedOn"]);
+                    newJob.Status = (JobStatus)Enum.Parse(typeof(JobStatus), Request.Form["jobStatus"]);
+                    newJob.AssignedTo = Technician.CreateTechnician(int.Parse(Request.Form["techID"])); 
+                    newJob.SaveJob();
+                    successMessage = "Sucessfully added job";
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = ex.Message;
+                }
+                break;
+            case "Edit":
+                job = Job.Load(jobID);
+                //Select the customer using linq. grab from the job.
+                if (job.Customer != null)
+                {
+                    customersSelectList.First(x => x.Value.Equals(job.Customer.ID.ToString())).Selected = true;
+                }
+                else
+                {
+                    errorMessage = "Could not find customer ID for job.";
+                }
+                break;
+            case "Update Job":
+                job = Job.Load(jobID);
+                job.Details = Request.Form["Details"];
+                job.RequestedOn = DateTime.Parse(Request.Form["RequestedOn"]);
+                job.Customer = Customer.LoadCustomer(customerID);
+                job.Status = (JobStatus)Enum.Parse(typeof(JobStatus), Request.Form["jobStatus"]);
+                job.AssignedTo = Technician.CreateTechnician(int.Parse(Request.Form["techID"])); 
+                job.Update();
+                successMessage = "Sucessfully updated job";
+                break;
+            default:
+                errorMessage = "This shouldn't have happened.";
+                break;
+        }
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        $(".datepicker").datepicker({
+            dateFormat: "MM/dd/yy"
+        });
+    });
+</script>
+<div class="content-wrapper">
+    <hgroup class="title">
+        <h1>Add Job</h1>
+        <h2></h2>
+    </hgroup>
+    <p class="error">@errorMessage</p>
+    <p class="message-success">@successMessage</p>
+
+    <form method="post">
+        <label>Customer:</label>@Html.DropDownList("customerID", customersSelectList)
+        <br />
+        <label>Notes</label>@Html.TextArea("details", job.Details)
+        <br />
+        <label>Requested On</label>@Html.TextBox("requestedOn", job.RequestedOn.ToString(Global.CodeDateFormat), new Dictionary<string, object> { { "class", "datepicker" } })
+        <br />
+        <label>Assigned To</label>@NinjaTek.TechAssignedList(job.AssignedTo, "techID")
+        <label>Current Status</label>@NinjaTek.JobStatusList(job.Status, "jobStatus")
+        <br />
+        @if (job.ID != -1)
+        {
+            <input type="hidden" name="jobID" value="@job.ID" />
+            <input type="submit" name="submit" value="Update Job" class="submit" />
+        }
+        else
+        {
+            <input type="submit" name="submit" value="Save Job" class="submit" />
+        }
+
+    </form>
+</div>

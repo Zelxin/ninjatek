@@ -1,0 +1,107 @@
+﻿@using MySql.Data.MySqlClient;
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Customer Details";
+    var errorMessage = "";
+    var successMessage = "";
+    Customer cust = new Customer();
+    if (IsPost) // This should be on it's own page after i test that it works properly.
+    {
+        var cn = new MySqlConnection(Global.ConnectionString());
+        cn.Open();
+        var type = Request.Form["submit"];
+        var custID = long.Parse(Request.Form["customerID"]);
+        switch (type)
+        {
+            case "View":
+                cust = Customer.LoadCustomer(custID);
+                break;
+            case "Save":
+                cust = Customer.LoadCustomer(custID);
+                cust.Name = Request.Form["name"];
+                cust.Address = Request.Form["address"];
+                cust.City = Request.Form["city"];
+                cust.PhoneNumber = Request.Form["phonenumber"];
+                cust.Email = Request.Form["email"];
+                cust.Comments = Request.Form["comments"];
+                try
+                {
+                    cust.UpdateCustomer();
+                    successMessage = "Customer added successfully.";
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = ex.Message;
+                }
+                break;
+            case "Create":
+                var newCustomer = new Customer();
+                newCustomer.Name = Request.Form["name"];
+                newCustomer.Address = Request.Form["address"];
+                newCustomer.City = Request.Form["city"];
+                newCustomer.PhoneNumber = Request.Form["phonenumber"];
+                newCustomer.Email = Request.Form["email"];
+                newCustomer.Comments = Request.Form["comments"];
+                try
+                {
+                    newCustomer.SaveCustomer();
+                    successMessage = "Customer added successfully.";
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = ex.Message;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.datepicker').datepicker(
+            {
+                dateFormat: "MM dd yy"
+            });
+        $('#jobsTable').DataTable();
+
+    });
+</script>
+
+<div class="content-wrapper">
+    <hgroup class="title">
+        <h1>@Page.Title</h1>
+        <h2></h2>
+    </hgroup>
+    <p class="message-success">@successMessage</p>
+    <p class="error">@errorMessage</p>
+
+    <form method="post">
+        <label>Name:</label>@Html.TextBox("name", @cust.Name)
+        <br />
+        <label>Address:</label>@Html.TextBox("address", @cust.Address)
+        <br />
+        <label>City:</label>@Html.TextBox("city", @cust.City)
+        <br />
+        <label>Phone Number:</label>@Html.TextBox("phonenumber", @cust.PhoneNumber)
+        <br />
+        <label>Email Address:</label>@Html.TextBox("email", @cust.Email)
+        <br />
+        <label>Comments:</label>@Html.TextArea("comments", @cust.Comments)
+        <br />
+        <input type="hidden" name="customerID" value="@cust.ID" />
+        @if (cust.ID < 0)
+        {
+            <input type="submit" name="submit" value="Create" class="submit" />
+        }
+        else
+        {
+            <input type="submit" name="submit" value="Save" class="submit" />
+        }
+    </form>
+
+    @if (cust.ID > 0)
+    {
+        @NinjaTek.JobsTable(@cust.ID)
+    }
+</div>

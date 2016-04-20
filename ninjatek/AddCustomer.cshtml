@@ -1,0 +1,65 @@
+﻿@using MySql.Data.MySqlClient;
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "NinjaTek";
+    var errorMessage = "";
+    var successMessage = "";
+    if (IsPost) // This should be on it's own page after i test that it works properly.
+    {
+        
+        var cn = new MySqlConnection(Global.ConnectionString());
+        cn.Open();
+
+        var name = Request.Form["name"];
+        var address = Request.Form["address"];
+        var city = Request.Form["city"];
+        var phonenumber = Request.Form["phonenumber"];
+        var email = Request.Form["email"];
+        var comments = Request.Form["comments"];
+        try
+        {
+            using (var cmd = cn.CreateCommand())
+            {
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@addr", address);
+                cmd.Parameters.AddWithValue("@city", city);
+                cmd.Parameters.AddWithValue("@phone", phonenumber);
+                cmd.Parameters.AddWithValue("@email", email);
+                cmd.Parameters.AddWithValue("@comments", comments);
+                cmd.Parameters.AddWithValue("@blacklist", 0);
+                cmd.CommandText = "Insert into Customers (`name`,`address`,`city`,`phone number`,`email`,`comments`, `blacklisted`) values (@name,@addr,@city,@phone,@email,@comments,@blacklist)";
+                cmd.ExecuteNonQuery();
+                successMessage = "Customer added successfully.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+
+    }
+}
+<div class="content-wrapper">
+    <hgroup class="title">
+        <h1>Add Customer</h1>
+        <h2></h2>
+    </hgroup>
+    <p class="message-success">@successMessage</p>
+    <p class="error">@errorMessage</p>
+    <form method="post">
+        <label>Name:</label>@Html.TextBox("name")
+        <br />
+        <label>Address:</label>@Html.TextBox("address")
+        <br />
+        <label>City:</label>@Html.TextBox("city")
+        <br />
+        <label>Phone Number:</label>@Html.TextBox("phonenumber")
+        <br />
+        <label>Email Address:</label>@Html.TextBox("email")
+        <br />
+        <label>Comments:</label>@Html.TextArea("comments")
+        <br />
+        <input type="submit" value="Submit" class="submit" />
+    </form>
+</div>
+

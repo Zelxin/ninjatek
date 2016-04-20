@@ -1,0 +1,15 @@
+﻿@using System.Text;
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        @{
+            var sbReq = new StringBuilder();
+            //https://maps.googleapis.com/maps/api/directions/json?origin=Boston,MA&destination=Concord,MA&waypoints=optimize:true|Charlestown,MA|Lexington,MA
+            sbReq.Append("https://maps.googleapis.com/maps/api/directions/json?");
+            sbReq.AppendFormat("key{0}&", Global.GOOGLE_API_KEY);
+            var req = WebRequest.Create(sbReq.ToString());
+        }
+    </body>
+</html>

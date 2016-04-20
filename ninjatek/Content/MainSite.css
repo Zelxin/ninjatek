@@ -1,0 +1,109 @@
+﻿body {
+    background-color: #212121;
+    color: #fff;
+    font-size: .85em;
+    font-family: "proxima-nova","Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 1.9em;
+    letter-spacing: 2.1px;
+    font-weight: 600;
+    font-style: normal;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #212121;
+    overflow: hidden;
+}
+
+.inner-header {
+    background-color: #212121;
+    margin: 45px 75px 90px 75px;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.smallHeading {
+    font-size: 1.15em;
+    font-weight: 900;
+}
+
+.content {
+    margin: 50px 0px 50px 0px;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+#siteTitle {
+    font-family: "proxima-nova","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    line-height: 1em;
+    color: inherit;
+    text-decoration: none;
+}
+
+.get-a-quote {
+    background-color: #212121;
+    -moz-border-radius: 28px;
+    -webkit-border-radius: 28px;
+    border-radius: 28px;
+    border: 1px solid #ffffff;
+    display: inline-block;
+    cursor: pointer;
+    color: #fff;
+    padding: 5px 10px;
+    text-decoration: none;
+    text-shadow: 0px 1px 0px #ffffff;
+}
+
+    .get-a-quote:hover {
+        background-color: #ffffff !important;
+        color: #212121;
+    }
+
+    .get-a-quote:active {
+        position: relative;
+        top: 1px;
+    }
+
+.input {
+    width: 50%;
+}
+/* menu
+----------------------------------------------------------*/
+ul#menu {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 5px;
+    padding: 0;
+    text-align: right;
+}
+
+    ul#menu li {
+        color: #fff;
+        display: inline;
+        list-style: none;
+        padding-left: 15px;
+    }
+
+        ul#menu li a {
+            color: #fff;
+            background: none;
+            text-decoration: none;
+        }
+
+            ul#menu li a:hover {
+                color: #333;
+                text-decoration: none;
+            }

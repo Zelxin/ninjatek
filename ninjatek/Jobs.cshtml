@@ -1,0 +1,80 @@
+﻿@using MySql.Data.MySqlClient;
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Jobs";
+    var errorMessage = "";
+    var successMessage = "";
+    var cn = new MySqlConnection(Global.ConnectionString());
+    cn.Open();
+
+    if (IsPost)
+    {
+        var submit = Request.Form["submit"];
+        var jobID = long.Parse(Request.Form["jobID"]);
+        switch (submit)
+        {
+            case "Delete":
+                {
+                    try
+                    {
+                        Job.Delete(jobID);
+                        successMessage = "Sucessfully deleted job.";
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessage = ex.Message;
+                    }
+                    break;
+                }
+            case "Complete":
+                {
+                    Job.Complete(jobID);
+                    successMessage = "Sucessfully marked job as completed.";
+                    break;
+                }
+            case "Change Status":
+                {
+                    var j = Job.Load(jobID);
+                    j.Status = (JobStatus)Enum.Parse(typeof(JobStatus), Request.Form["jobStatus"].ToString());
+                    j.UpdateJobStatus();
+                    successMessage = "Sucessfully updated job status";
+                    break;
+                }
+            case "Change Technician":
+                {
+                    var j = Job.Load(jobID);
+                    j.AssignedTo = Technician.CreateTechnician(int.Parse(Request.Form["techAssigned"].ToString()));
+                    j.UpdateTechAssigned();
+                    successMessage = "Sucessfully updated job status";
+                    break;
+                }
+            default:
+                break;
+        }
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#jobsTable').DataTable({
+            "columnDefs": [ {
+                "targets": 2,
+                "width": "350px"
+            } ],
+            "lengthMenu": [[100, 50, 10, -1], [100, 50, 10, "All"]]
+        });
+        //This is where we limit it to 200 characters
+        $('.txt-limit-200').text(function (index, currentText) {
+            return currentText.substr(0, 200);
+        })
+    });
+</script>
+<div class="content-wrapper">
+    <hgroup class="title">
+        <h1>@Page.Title</h1>
+        <h2></h2>
+    </hgroup>
+    <p class="error">@errorMessage</p>
+    <p class="message-success">@successMessage</p>
+    @NinjaTek.JobsTable(-1)
+    
+</div>

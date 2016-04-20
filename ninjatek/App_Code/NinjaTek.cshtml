@@ -1,0 +1,120 @@
+﻿@helper JobsTable(long customerID)
+{
+            Job.GetRoute(Job.GetAllJobs());
+    List<Job> jobs = null;
+    if (customerID == -1)
+    {
+        jobs = Job.GetAllJobs();
+    }
+    else
+    {
+        var cust = Customer.LoadCustomer(customerID);
+        jobs = cust.GetAllJobs();
+    }
+    //Sort jobs to get priority order.
+    jobs.Sort((x1, x2) =>
+    {
+        var statusCompare = x1.Status.CompareTo(x2.Status);
+        if (statusCompare == 0)
+        {
+            return x1.RequestedOn.CompareTo(x2.RequestedOn);
+        }
+        else
+        {
+            return statusCompare;
+        }
+    });
+
+    var headers = new string[] { "Priority", "Customer", "Details", "Requested On", "Completed On", "Mark Completed", "Edit", "Status","Technician" };
+    <div>
+        <table id="jobsTable" class="display" cellspacing="0" style="width:100%;">
+            <thead>
+                <tr>
+                    @foreach (var header in headers)
+                    {
+                        <th>@header.ToString()</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var count = 0;
+                }
+                @foreach (var job in jobs)
+                {
+                    <tr id='@job.GetStatusClass()'>
+                        <td>@count</td>
+                        <td>@(job.Customer == null ? "" : job.Customer.Name)</td>
+                        <td class="txt-limit-200">@job.Details</td>
+                        <td>@job.RequestedOn.ToString(Global.CodeDateFormat)</td>
+                        <td>@(job.CompletedOn == DateTime.MinValue ? "" : job.CompletedOn.ToString(Global.CodeDateFormat))</td>
+                        <!--Complete Job-->
+                        <td>
+                            <form method="post" action="~/Jobs.cshtml">
+                                <input type="hidden" name="jobID" value="@job.ID" />
+                                <input type="submit" name="submit" value="Complete" class="submit" />
+                            </form>
+                        </td>
+                        <!--Edit Job-->
+                        <td>
+                            <form method="post" action="AddJob.cshtml">
+                                <input type="hidden" name="jobID" value="@job.ID" />
+                                <input type="submit" name="submit" value="Edit" class="submit" />
+                            </form>
+                        </td>
+                        <!--Quick Change Status-->
+                        <td>
+                            <form method="post" action="~/Jobs.cshtml">
+                                <input type="hidden" name="jobID" value="@job.ID" />
+                                @JobStatusList(job.Status, "jobStatus")
+                                <input type="submit" name="submit" value="Change Status" class="submit">
+                            </form>
+                        </td>
+                        <!--Quick Change Tech-->
+                        <td>
+                            <form method="post" action="~/Jobs.cshtml">
+                                <input type="hidden" name="jobID" value="@job.ID" />
+                                @TechAssignedList(job.AssignedTo, "techAssigned")
+                                <input type="submit" name="submit" value="Change Technician" class="submit">
+                            </form>
+                        </td>
+                    </tr>
+                    count++;
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@helper JobsTable()
+{
+    JobsTable(-1);
+}
+
+@helper JobStatusList(JobStatus selectedStatus, string name)
+{
+    //Get list of job statuses
+    var statuses = Job.GetJobStatuses();
+    //Convert to SelectListItem
+    var displayStatuses = (from status in statuses
+                           select new SelectListItem() { Text = Global.GetDescription(status), Value = status.ToString() }).ToList();
+    //Set status to the correct status
+    displayStatuses.First(x => x.Value.Equals(selectedStatus.ToString())).Selected = true;
+    @Html.DropDownList(name, displayStatuses)
+}
+
+@helper TechAssignedList(Technician selectedTech, string name)
+{
+    //Get list of job statuses
+    var techs = Technician.GetAllTechnicians();
+    //Convert to SelectListItem
+    var displayTechs = (from t in techs
+                        select new SelectListItem() { Text = t.Name, Value = t.ID.ToString() }).ToList();
+    //Set status to the correct status
+    if (selectedTech != null)
+    {
+        var currentTech = displayTechs.FirstOrDefault(x => x.Value.Equals(selectedTech.ID.ToString()));
+        if (currentTech != null) { currentTech.Selected = true; }
+    }
+    @Html.DropDownList(name, displayTechs)
+}

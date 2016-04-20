@@ -1,0 +1,105 @@
+﻿@using MySql.Data.MySqlClient
+@* Remove this section if you are using bundling *@
+@section Scripts {
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+}
+
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Log in";
+
+    var returnUrl = Request.QueryString["ReturnUrl"];
+    if (returnUrl.IsEmpty())
+    {
+        // Some external login providers always require a return URL value
+        returnUrl = Href("~/");
+    }
+
+    //WebSecurity.CreateUserAndAccount("ninjatek", "jJ1568879");
+    var uid = "";
+    var password = "";
+    var rememberMe = false;
+
+    // Setup validation
+    Validation.RequireField("email", "You must specify an email address.");
+    Validation.RequireField("password", "You must specify a password.");
+    Validation.Add("password",
+        Validator.StringLength(
+            maxLength: Int32.MaxValue,
+            minLength: 6,
+            errorMessage: "Password must be at least 6 characters"));
+
+    // If this is a POST request, validate and process data
+    if (IsPost)
+    {
+        AntiForgery.Validate();
+        // is this an external login request?
+        string provider = Request.Form["provider"];
+        if (!provider.IsEmpty())
+        {
+            OAuthWebSecurity.RequestAuthentication(provider, Href("~/Account/RegisterService", new { returnUrl }));
+            return;
+        }
+        else if (Validation.IsValid())
+        {
+            uid = Request.Form["email"];
+            password = Request.Form["password"];
+            rememberMe = Request.Form["rememberMe"].AsBool();
+            var cnB = new MySqlConnectionStringBuilder();
+            cnB["Data Source"] = "198.71.225.52";
+            cnB["Initial Catalog"] = "ninjatekweb_";
+            cnB["UID"] = "ninjatekadmin";
+            cnB["Password"] = "Snail@Task";
+            if(WebSecurity.Login(uid, password))
+            {
+                Context.RedirectLocal("~/DBMain.cshtml");  // Hardcodes to just take you to DBMain.
+                return;
+            }
+            else
+            {
+               //failed login 
+            }
+        }
+    }
+}
+
+<hgroup class="title">
+    <h1>@Page.Title.</h1>
+</hgroup>
+
+<section id="loginForm">
+    <h2>Use a local account to log in.</h2>
+    <form method="post">
+        @AntiForgery.GetHtml()
+        @* If one or more validation errors exist, show an error *@
+        @Html.ValidationSummary("Log in was unsuccessful. Please correct the errors and try again.", excludeFieldErrors: true, htmlAttributes: null)
+        <fieldset>
+            <legend>Log in to Your Account</legend>
+            <ol>
+                <li class="email">
+                    <label for="email" @if (!ModelState.IsValidField("uid")) { <text> class="error-label" </text>  }>Email address</label>
+                    <input type="text" id="email" name="email" value="@uid" @Validation.For("email") />
+                    @* Write any user name validation errors to the page *@
+                    @Html.ValidationMessage("email")
+                </li>
+                <li class="password">
+                    <label for="password" @if (!ModelState.IsValidField("password")) { <text> class="error-label" </text>  }>Password</label>
+                    <input type="password" id="password" name="password" @Validation.For("password") />
+                    @* Write any password validation errors to the page *@
+                    @Html.ValidationMessage("password")
+                </li>
+                <li class="remember-me">
+                    <input type="checkbox" id="rememberMe" name="rememberMe" value="true" checked="@rememberMe" />
+                    <label class="checkbox" for="rememberMe">Remember me?</label>
+                </li>
+            </ol>
+            <input type="submit" value="Log in" />
+        </fieldset>
+    </form>
+</section>
+
+<section class="social" id="socialLoginForm">
+    <h2>Use another service to log in.</h2>
+    @RenderPage("~/Account/_ExternalLoginsList.cshtml")
+</section>

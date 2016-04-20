@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@Page.Title</title>
+    <link href="~/Content/MainSite.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css" />
+    <link href="~/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <link href="//cdn.datatables.net/plug-ins/1.10.7/integration/jqueryui/dataTables.jqueryui.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
+
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="http://www.datatables.net/release-datatables/extensions/FixedColumns/js/dataTables.fixedColumns.js"></script>
+    <script src="~/Scripts/jquery-ui-1.10.3.js"></script>
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+    <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+    <header>
+        <div class="inner-header">
+            <div class="float-left">
+                <a id="siteTitle" href="~/">NINJATEK.CA | TORONTO WINDOW & EAVES</a>
+            </div>
+            <div class="float-right">
+                <nav>
+                    <ul id="menu">
+                        <li><a href="~/">HOME</a></li>
+                        <li><a href="~/Voucher.cshtml">VOUCHER</a></li>
+                        <li><a href="~/WindowCleaning.cshtml">WINDOW CLEANING</a></li>
+                        <li><a href="~/EavesCleaning.cshtml">EAVES CLEANING</a></li>
+                        <li><a href="~/Repair.cshtml">REPAIR</a></li>
+                        <li><a href="~/Contact.cshtml">CONTACT</a></li>
+                        <li><a href="~/get-a-quote.cshtml" class="get-a-quote">Get a Quote</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    @RenderBody()
+    <footer>
+        <div>
+            <div style="width:500px; margin:0 auto; text-align:center;">
+                <p>copyright 2015 ninjatek.ca</p>
+                <p><a href="~/Account/Login.cshtml">Login</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
